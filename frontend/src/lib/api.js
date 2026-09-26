@@ -1,0 +1,29 @@
+const rawUrl =
+  import.meta.env.VITE_API_BASE ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:8000'
+
+const API_BASE = rawUrl.replace(/\/+$/, '')
+
+export async function sendMessage(message, mode, history = [], signal) {
+  const res = await fetch(`${API_BASE}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, mode, history }),
+    signal,
+  })
+
+  if (!res.ok) {
+    throw new Error(`Request failed (${res.status})`)
+  }
+  return res.json() // { response: string }
+}
+
+export async function checkHealth() {
+  try {
+    const res = await fetch(API_BASE, { method: 'GET' })
+    return res.ok
+  } catch {
+    return false
+  }
+}
